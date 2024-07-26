@@ -2,7 +2,11 @@ import mongoose  from 'mongoose';
 
 
 const  productSchema = new mongoose.Schema({
-    name: String,
-    price: Number
+    name: { type: String, required: true , minLength: 3},
+    price: { type: Number, required: true   }, 
+    description : {type : String , }
+}, { 
+    timestamps: true, 
+    versionKey: false ,
 })
 export default mongoose.model('Product', productSchema);

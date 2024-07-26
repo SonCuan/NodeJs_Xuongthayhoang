@@ -1,4 +1,5 @@
 import Product from "../models/Product.js";
+import { productValid } from "../validation/product.js";
 
 
 export const getAll =  async(req, res) => {
@@ -33,14 +34,68 @@ export const getDetail = async (req, res) => {
     }
 };
 
-export const creat = (req, res) => {
-    res.send('Tao san pham thanh cong');
+export const create = async (req, res) => {
+   try {
+    const {error} = productValid.validate(req.body);
+    if ( error ) { 
+        return res.status(400).json({
+            message: error.details[0].message,
+        })
+    }
+    const product = await Product.create(req.body);
+    if(!product) { 
+        return res.status(400).json({
+            message : "Không tạo được sản phẩm"
+        }) 
+    }else { 
+        return res.status(200).json({
+            message : "Tạo sản phẩm thành công", 
+            data : product, 
+        })
+    }
+   } catch (error) {
+        return res.status(500).json({ message: error.message });
+   }
 };
 
-export const update = (req, res) => {
-    res.send('Cap nhat san pham thanh cong');
+export const update = async (req, res) => {
+  try {
+    const {error} = productValid.validate(req.body , {abortEarly : true     });
+    if ( error ) { 
+        return res.status(400).json({
+            message: error.details[0].message,
+        })
+    }
+    const product = await Product.findByIdAndUpdate(req.params.id, req.body , {new : true });
+    if(!product) {
+        return res.status(400).json({
+            message : "Không cập nhật được sản phẩm"
+        })
+    }else {
+        return res.status(200).json({
+            message : "Cập nhật sản phẩm thành công", 
+            data : product, 
+        })
+    }
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
 };
 
-export const remove = (req, res) => {
-    res.send('Xoa san pham thanh cong');
+export const remove = async  (req, res) => {
+    try {
+        const data =  await Product.findByIdAndDelete(req.params.id);
+        if (!data){ 
+            return res.status(400).json({
+                message : "Khong xoa  được sản phẩm"
+            })
+        }else { 
+            return res.status(200).json({
+                message : "Xoa sản phẩm thành công", 
+                data : data,
+            })
+        }
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
 }
