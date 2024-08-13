@@ -70,7 +70,7 @@ export const signIn = async (req,res) => {
             })
         }
         // b5 : Tao JWT
-        const accessToken = jwt.sign({_id: user._id } , SECRET_CODE)
+        const accessToken = jwt.sign({_id: user._id } , SECRET_CODE , { expiresIn : "1d"}); 
         user.password = undefined;
         // b6 : thong bao cho nguoi dung    
         return res.status(200).json({

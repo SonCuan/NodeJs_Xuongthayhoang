@@ -24,7 +24,8 @@ export const signUpValidator = Joi.object({
         "string.min" : "confirmPassword phải có ít nhất (#litmit) ký tự",
         "string.max" : "confirmPassword phải ít hơn (#litmit + 1) ký tự",
         "any.only" : "confirmPassword không khớp với password"
-    })
+    }),
+    role : Joi.string()
 })
 
 export const signInValidator = Joi.object({

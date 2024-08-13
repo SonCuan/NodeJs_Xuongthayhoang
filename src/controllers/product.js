@@ -1,10 +1,11 @@
+import Category from "../models/Category.js";
 import Product from "../models/Product.js";
 import { productValid } from "../validation/product.js";
 
 
 export const getAll =  async(req, res) => {
     try {
-        const products = await Product.find();
+        const products = await Product.find().populate("categoryId");
         if(products.length === 0) {
           return res.status(404).json ({
            message: 'Không tìm thấy sản phẩm' });
@@ -20,7 +21,7 @@ export const getAll =  async(req, res) => {
 };
 export const getDetail = async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id);
+        const product = await Product.findById(req.params.id).populate("categoryId");
         if(!product) {
           return res.status(404).json ({
            message: 'Không tìm thấy sản phẩm' });
@@ -47,7 +48,14 @@ export const create = async (req, res) => {
         return res.status(400).json({
             message : "Không tạo được sản phẩm"
         }) 
-    }else { 
+    }
+    const updateCategory = await Category.findByIdAndUpdate(product.categoryId , {$addToSet : {products : product._id} } ) 
+    if(!updateCategory) {
+        return res.status(400).json({
+            message : "Cập nhật danh mục thất bại"
+        })   
+    }
+    else{ 
         return res.status(200).json({
             message : "Tạo sản phẩm thành công", 
             data : product, 
@@ -71,7 +79,14 @@ export const update = async (req, res) => {
         return res.status(400).json({
             message : "Không cập nhật được sản phẩm"
         })
-    }else {
+    }
+    const updateCategory = await Category.findByIdAndUpdate(product.categoryId , {$addToSet : {products : product._id} } ) 
+    if(!updateCategory) {
+        return res.status(400).json({
+            message : "Cập nhật danh mục thất bại"
+        })   
+    }
+    else {
         return res.status(200).json({
             message : "Cập nhật sản phẩm thành công", 
             data : product, 
@@ -89,7 +104,14 @@ export const remove = async  (req, res) => {
             return res.status(400).json({
                 message : "Khong xoa  được sản phẩm"
             })
-        }else { 
+        }
+        const updateCategory = await Category.findByIdAndUpdate(product.categoryId , {$addToSet : {products : product._id} } ) 
+        if(!updateCategory) {
+            return res.status(400).json({
+                message : "Cập nhật danh mục thất bại"
+            })   
+        }
+        else { 
             return res.status(200).json({
                 message : "Xoa sản phẩm thành công", 
                 data : data,
